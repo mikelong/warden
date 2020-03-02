@@ -29,10 +29,15 @@ module Warden
     # If this is downstream from another warden instance, don't do anything.
     # :api: private
     def call(env) # :nodoc:
+      if env['warden'] && env['warden'].manager != self
+        puts "CALLING WITHOUT CATCH"
+      end
+
       return @app.call(env) if env['warden'] && env['warden'].manager != self
 
       env['warden'] = Proxy.new(env, self)
       result = catch(:warden) do
+        puts "CALLING WITH CATCH"
         @app.call(env)
       end
 
